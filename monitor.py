@@ -1,5 +1,6 @@
 import psutil
 import time
+from datetime import datetime
 
 CPU_THRESHOLD = 80
 MEMORY_THRESHOLD = 80
@@ -17,6 +18,15 @@ def display_metrics(cpu, memory, disk):
     print(f"CPU Usage: {cpu}%")
     print(f"Memory Usage: {memory}%")
     print(f"Disk Usage: {disk}%")
+
+def write_log(cpu, memory, disk):
+    with open("logs/monitor.log", "a") as log_file:
+        log_file.write("=" * 40 + "\n")
+        log_file.write(f"Time: {datetime.now()}\n")
+        log_file.write(f"CPU Usage: {cpu}%\n")
+        log_file.write(f"Memory Usage: {memory}%\n")
+        log_file.write(f"Disk Usage: {disk}%\n")
+        log_file.write("=" * 40 + "\n\n")
 
 
 def check_thresholds(cpu, memory, disk):
@@ -36,12 +46,13 @@ def main():
 
         display_metrics(cpu, memory, disk)
 
+        write_log(cpu, memory, disk)
+
         check_thresholds(cpu, memory, disk)
 
         print("-" * 40)
 
         time.sleep(5)
-
 
 if __name__ == "__main__":
     main()
