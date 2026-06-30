@@ -1,4 +1,5 @@
 import psutil
+import time
 
 CPU_THRESHOLD = 80
 MEMORY_THRESHOLD = 80
@@ -30,9 +31,16 @@ def check_thresholds(cpu, memory, disk):
 
 
 def main():
-    cpu, memory, disk = collect_system_metrics()
-    display_metrics(cpu, memory, disk)
-    check_thresholds(cpu, memory, disk)
+    while True:
+        cpu, memory, disk = collect_system_metrics()
+
+        display_metrics(cpu, memory, disk)
+
+        check_thresholds(cpu, memory, disk)
+
+        print("-" * 40)
+
+        time.sleep(5)
 
 
 if __name__ == "__main__":
