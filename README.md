@@ -19,22 +19,30 @@ The project demonstrates practical Linux administration, Python automation, Bash
 ```text
 system-monitoring-auto-recovery/
 │
-├── README.md             # Project documentation
-├── monitor.py            # Monitors CPU, memory, and disk usage
-├── service_restart.sh    # Automatically restarts the Nginx service
-└── requirements.txt      # Python dependencies
+├── monitor.py           # Main application
+├── monitoring.py        # System metrics collection
+├── recovery.py          # Recovery workflow
+├── config.py            # Configuration settings
+├── service_restart.sh   # Linux recovery script
+├── requirements.txt
+├── README.md
+├── logs/
+│   └── monitor.log
+└── .gitignore
 ```
 
 ## Features
 
-- Monitors CPU utilization in real time.
-- Monitors memory utilization.
-- Monitors disk usage.
-- Detects resource utilization beyond configured thresholds.
-- Displays alerts when thresholds are exceeded.
-- Checks the status of the Nginx service.
-- Automatically restarts the service if it is not running.
-- Designed for Linux system administration and automation tasks.
+- Real-time CPU monitoring
+- Real-time Memory monitoring
+- Real-time Disk monitoring
+- Configurable threshold values
+- Automatic logging using Python's `logging` module
+- Threshold-based alert detection
+- Automated recovery workflow
+- Modular Python architecture
+- Linux service recovery support
+- Professional project structure
 
 ## Monitoring Architecture
 
@@ -147,24 +155,22 @@ Nginx restarted successfully.
 
 ## Current Limitations
 
-- Threshold values are currently hardcoded in the Python script.
-- The recovery script is configured to restart only the Nginx service.
-- Monitoring is executed manually when the script is run.
-- Alerts are displayed only in the terminal.
-- Monitoring data is not stored in log files or a database.
-
+- Recovery script is currently a placeholder for Windows and is intended for Linux environments.
+- Alerts are displayed in the terminal and log files only.
+- Email or messaging notifications are not yet implemented.
+- The project currently monitors a single system instance.
 ---
 
 ## Future Enhancements
 
-- Store threshold values in a configuration file.
-- Implement continuous monitoring.
-- Generate monitoring logs automatically.
-- Monitor and recover multiple Linux services.
-- Send alerts via Email or Slack.
-- Build a web dashboard for monitoring system health.
-- Containerize the application using Docker.
-- Deploy the project on AWS EC2.
+- Email notifications
+- Slack or Microsoft Teams integration
+- Docker container support
+- AWS EC2 deployment
+- Prometheus metrics integration
+- Grafana monitoring dashboard
+- Multi-service monitoring
+- Kubernetes health monitoring
 
 ---
 
@@ -173,12 +179,16 @@ Nginx restarted successfully.
 Through this project, I gained practical experience in:
 
 - Python-based system monitoring using the `psutil` library.
-- Bash scripting for Linux automation.
-- Linux service management with `systemctl`.
-- CPU, memory, and disk resource monitoring.
-- Basic DevOps automation workflows.
-- Linux troubleshooting and operational best practices.
-
+- Collecting and analyzing CPU, memory, and disk usage metrics.
+- Building modular Python applications using multiple modules.
+- Configuration management using a dedicated `config.py` file.
+- Implementing structured logging with Python's `logging` module.
+- Exception handling and application error management.
+- Designing threshold-based alerting and automated recovery workflows.
+- Linux service management and Bash scripting fundamentals.
+- Organizing projects using professional software architecture principles.
+- Version control using Git and GitHub with meaningful commits.
+- Understanding basic DevOps and Site Reliability Engineering (SRE) concepts.
 ---
 
 ## License
