@@ -1,33 +1,27 @@
 import os
 import logging
-import subprocess
-import psutil
 import time
 
-CPU_THRESHOLD = 80
-MEMORY_THRESHOLD = 80
-DISK_THRESHOLD = 80
+from config import (
+    CPU_THRESHOLD,
+    MEMORY_THRESHOLD,
+    DISK_THRESHOLD,
+    MONITOR_INTERVAL,
+    LOG_DIRECTORY,
+    LOG_FILE,
+)
+
+from monitoring import collect_system_metrics, display_metrics
+from recovery import recover_service
 
 logging.basicConfig(
-    filename="logs/monitor.log",
+    filename=LOG_FILE,
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-def collect_system_metrics():
-    cpu = psutil.cpu_percent(interval=1)
-    memory = psutil.virtual_memory().percent
-    disk = psutil.disk_usage('/').percent
-    return cpu, memory, disk
-
-
-def display_metrics(cpu, memory, disk):
-    print(f"CPU Usage: {cpu}%")
-    print(f"Memory Usage: {memory}%")
-    print(f"Disk Usage: {disk}%")
-
 def create_log_directory():
-    os.makedirs("logs", exist_ok=True)
+    os.makedirs(LOG_DIRECTORY, exist_ok=True)
 
 def write_log(cpu, memory, disk):
     logging.info(
@@ -52,24 +46,7 @@ def check_thresholds(cpu, memory, disk):
         logging.warning("High Disk Usage Detected")
         recover_service()
 
-def recover_service():
-    logging.info("Recovery process initiated.")
-    print("Recovery process started...")
 
-    try:
-        print("Executing recovery script...")
-
-        # Placeholder for Linux implementation
-        # subprocess.run(["bash", "service_restart.sh"], check=True)
-
-        logging.info("Recovery completed successfully.")
-        print("Recovery completed successfully.")
-
-    except Exception as e:
-        logging.error(f"Recovery failed: {e}")
-        print(f"Recovery failed: {e}")
-
-        
 def main():
     while True:
         try:
@@ -88,7 +65,7 @@ def main():
         except Exception as e:
             print(f"Error: {e}")
 
-        time.sleep(5)
+        time.sleep(MONITOR_INTERVAL)
 
 
 if __name__ == "__main__":
