@@ -1,11 +1,18 @@
+import os
+import logging
+import subprocess
 import psutil
 import time
-from datetime import datetime
 
 CPU_THRESHOLD = 80
 MEMORY_THRESHOLD = 80
 DISK_THRESHOLD = 80
 
+logging.basicConfig(
+    filename="logs/monitor.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 def collect_system_metrics():
     cpu = psutil.cpu_percent(interval=1)
@@ -19,40 +26,70 @@ def display_metrics(cpu, memory, disk):
     print(f"Memory Usage: {memory}%")
     print(f"Disk Usage: {disk}%")
 
+def create_log_directory():
+    os.makedirs("logs", exist_ok=True)
+
 def write_log(cpu, memory, disk):
-    with open("logs/monitor.log", "a") as log_file:
-        log_file.write("=" * 40 + "\n")
-        log_file.write(f"Time: {datetime.now()}\n")
-        log_file.write(f"CPU Usage: {cpu}%\n")
-        log_file.write(f"Memory Usage: {memory}%\n")
-        log_file.write(f"Disk Usage: {disk}%\n")
-        log_file.write("=" * 40 + "\n\n")
+    logging.info(
+        f"CPU: {cpu}% | Memory: {memory}% | Disk: {disk}%"
+    )
 
 
 def check_thresholds(cpu, memory, disk):
+
     if cpu > CPU_THRESHOLD:
         print("High CPU Usage Alert")
+        logging.warning("High CPU Usage Detected")
+        recover_service()
 
     if memory > MEMORY_THRESHOLD:
         print("High Memory Usage Alert")
+        logging.warning("High Memory Usage Detected")
+        recover_service()
 
     if disk > DISK_THRESHOLD:
         print("High Disk Usage Alert")
+        logging.warning("High Disk Usage Detected")
+        recover_service()
 
+def recover_service():
+    logging.info("Recovery process initiated.")
+    print("Recovery process started...")
 
+    try:
+        print("Executing recovery script...")
+
+        # Placeholder for Linux implementation
+        # subprocess.run(["bash", "service_restart.sh"], check=True)
+
+        logging.info("Recovery completed successfully.")
+        print("Recovery completed successfully.")
+
+    except Exception as e:
+        logging.error(f"Recovery failed: {e}")
+        print(f"Recovery failed: {e}")
+
+        
 def main():
     while True:
-        cpu, memory, disk = collect_system_metrics()
+        try:
+            create_log_directory()
 
-        display_metrics(cpu, memory, disk)
+            cpu, memory, disk = collect_system_metrics()
 
-        write_log(cpu, memory, disk)
+            display_metrics(cpu, memory, disk)
 
-        check_thresholds(cpu, memory, disk)
+            write_log(cpu, memory, disk)
 
-        print("-" * 40)
+            check_thresholds(cpu, memory, disk)
+
+            print("-" * 40)
+
+        except Exception as e:
+            print(f"Error: {e}")
 
         time.sleep(5)
+
 
 if __name__ == "__main__":
     main()
