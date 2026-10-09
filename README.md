@@ -1,208 +1,248 @@
 # System Monitoring & Auto-Recovery Tool
 
+A Linux system monitoring and automated service recovery tool built with Python, Bash, and `psutil`. The project demonstrates practical DevOps and Site Reliability Engineering (SRE) concepts, including system resource monitoring, service health checks, automated remediation, and logging.
+
 ## Project Overview
 
-The project demonstrates practical Linux administration, Python automation, Bash scripting, and basic DevOps and Site Reliability Engineering (SRE) concepts. It is designed to showcase how monitoring and automated recovery can improve system availability and reduce manual operational effort.# System Monitoring & Auto-Recovery Tool
+The application continuously monitors CPU, memory, and disk utilization. It checks the health of the Nginx service and automatically invokes a Bash recovery script if the service becomes inactive.
+
+The recovery script attempts to restart Nginx and verifies whether the service becomes active. Monitoring and recovery events are recorded in a log file for troubleshooting and operational visibility.
 
 ## Technologies Used
 
-- **Programming Language:** Python
+- **Language:** Python 3
 - **Scripting:** Bash
-- **Operating System:** Linux
-- **Python Library:** psutil
-- **Service Management:** systemctl
+- **Operating System:** Linux (Ubuntu)
+- **Metrics Collection:** `psutil`
+- **Service Management:** `systemctl`
 - **Example Service:** Nginx
-- **Version Control:** Git & GitHub
+- **Logging:** Python `logging` module
+- **Version Control:** Git and GitHub
+
+## Features
+
+- Continuous CPU, memory, and disk utilization monitoring
+- Configurable resource thresholds
+- Threshold-based terminal alerts
+- Nginx service health monitoring
+- Python-triggered automated service recovery
+- Bash-based service restart and post-restart verification
+- Structured application logging
+- Exception handling and recovery timeout handling
+- Modular Python architecture
+- Graceful shutdown using Ctrl+C
 
 ## Project Structure
 
 ```text
 system-monitoring-auto-recovery/
-│
-├── monitor.py           # Main application
-├── monitoring.py        # System metrics collection
-├── recovery.py          # Recovery workflow
-├── config.py            # Configuration settings
-├── service_restart.sh   # Linux recovery script
-├── requirements.txt
-├── README.md
+├── monitor.py           # Main monitoring loop and service health checks
+├── monitoring.py        # System metrics collection and display
+├── recovery.py          # Executes and handles the recovery workflow
+├── config.py            # Thresholds, interval, and log configuration
+├── service_restart.sh   # Bash-based Nginx recovery and verification
+├── requirements.txt     # Python dependencies
+├── README.md            # Project documentation
 ├── logs/
-│   └── monitor.log
+│   └── monitor.log      # Runtime monitoring and recovery logs
 └── .gitignore
 ```
 
-## Features
-
-- Real-time CPU monitoring
-- Real-time Memory monitoring
-- Real-time Disk monitoring
-- Configurable threshold values
-- Automatic logging using Python's `logging` module
-- Threshold-based alert detection
-- Automated recovery workflow
-- Modular Python architecture
-- Linux service recovery support
-- Professional project structure
-
-## Monitoring Architecture
+## Architecture
 
 ```text
-            Linux Server
-                  │
-      ┌───────────┼───────────┐
-      ▼           ▼           ▼
-    CPU       Memory       Disk
- Monitoring  Monitoring  Monitoring
-      │           │           │
-      └───────────┼───────────┘
-                  ▼
-          Python Monitoring
-                Script
-                  │
-                  ▼
-           Threshold Check
-                  │
-          ┌───────┴───────┐
-          ▼               ▼
-      Normal         Alert Triggered
-                           │
-                           ▼
-                    Service Recovery
-                    Restart Workflow
+System Resources
+       |
+       v
+CPU / Memory / Disk Metrics
+       |
+       v
+Python Monitoring Loop
+       |
+       +----------------------+
+       |                      |
+       v                      v
+Threshold Checks        Nginx Health Check
+                              |
+                    +---------+---------+
+                    |                   |
+                    v                   v
+                  Active             Inactive
+                    |                   |
+                    v                   v
+              Continue Loop       recovery.py
+                                        |
+                                        v
+                                service_restart.sh
+                                        |
+                                        v
+                                 Restart Nginx
+                                        |
+                                        v
+                              Verify Service Status
+                                        |
+                                        v
+                                 Log the Outcome
 ```
 
+## Prerequisites
 
-## Operational Capabilities
-
-- CPU utilization monitoring
-- Memory usage monitoring
-- Disk utilization monitoring
-- Threshold-based alerting
-- Automated service recovery
-- Linux operational troubleshooting
-- System health visibility
-
-  ## Prerequisites
-
-Before running this project, ensure you have the following installed:
-
-- Linux operating system (Ubuntu recommended)
-- Python 3.x
-- pip (Python package manager)
+- Linux system with systemd (Ubuntu recommended)
+- Python 3
+- pip
+- Bash
 - Git
 - Nginx
-- Bash shell
+- Sufficient permissions to check and restart the Nginx service
 
-  ## Installation
+## Installation
 
-1. Clone the repository:
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/roshithagardhas/system-monitoring-auto-recovery.git
-```
-
-2. Navigate to the project directory:
-
-```bash
 cd system-monitoring-auto-recovery
 ```
 
-3. Install the required Python package:
+### 2. Create and activate a virtual environment
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
 ```
+
+### 3. Install dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### 4. Install Nginx if it is not already installed
+
+On Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install nginx
+```
+
+Confirm the service is available:
+
+```bash
+systemctl is-active nginx
+```
+
+The monitoring script needs appropriate system permissions to check and restart the service.
+
+## Configuration
+
+Update `config.py` to adjust the monitoring behavior.
+
+Default settings:
+
+- CPU threshold: 80%
+- Memory threshold: 80%
+- Disk threshold: 80%
+- Monitoring interval: 5 seconds
+
+The application writes monitoring and recovery events to `logs/monitor.log`.
 
 ## Usage
 
-### Run the monitoring script
+### Run the monitoring application
+
+From the project directory, with the virtual environment activated:
 
 ```bash
 python monitor.py
 ```
 
-### Run the service recovery script
+The application continuously collects system metrics and checks Nginx health. Press `Ctrl+C` to stop monitoring gracefully.
+
+### Run the recovery script independently
 
 ```bash
 bash service_restart.sh
 ```
 
-## Sample Output
+This script checks Nginx status, attempts a restart if the service is inactive, and verifies the resulting service state.
 
-### Normal System
+### View recent logs
 
-```text
-CPU Usage: 35%
-Memory Usage: 42%
-Disk Usage: 58%
-
-System resources are operating within normal limits.
+```bash
+tail -n 80 logs/monitor.log
 ```
 
-### High Resource Utilization
+## Validation and Testing
+
+The following end-to-end test was performed on a Linux environment:
+
+1. Confirmed that Nginx was active.
+2. Stopped Nginx to simulate a service failure.
+3. Started the Python monitoring application.
+4. Confirmed that Python detected the inactive service.
+5. Confirmed that Python invoked the recovery workflow.
+6. Verified that the Bash script restarted Nginx successfully.
+7. Observed subsequent monitoring cycles reporting that Nginx was active.
+8. Checked the log file for detection, recovery, and service health events.
+
+### Evidence from the test
 
 ```text
-CPU Usage: 92%
-High CPU Usage Alert
-
-Checking Nginx service...
-Nginx is down.
-Restarting service...
-Nginx restarted successfully.
+Service Alert: nginx is not active.
+Recovery process started...
+[WARNING] nginx is down.
+[INFO] Attempting to restart nginx...
+[SUCCESS] nginx restarted successfully.
+Recovery script completed successfully.
+Recovery verified for nginx.
+Service Health: nginx is active.
 ```
 
----
+The log file recorded the recovery event and subsequent successful health checks. The final `systemctl is-active nginx` check returned `active`.
 
 ## Current Limitations
 
-- Recovery script is currently a placeholder for Windows and is intended for Linux environments.
-- Alerts are displayed in the terminal and log files only.
-- Email or messaging notifications are not yet implemented.
-- The project currently monitors a single system instance.
----
+- The application currently monitors a single configured service: Nginx.
+- Resource alerts are reported in the terminal and log file.
+- External notification integrations are not implemented.
+- The application is intended for Linux systems using systemd.
+- Threshold alerts currently report high resource utilization; they do not automatically remediate CPU, memory, or disk pressure.
 
 ## Future Enhancements
 
-- Email notifications
-- Slack or Microsoft Teams integration
-- Docker container support
-- AWS EC2 deployment
+- Email, Slack, or Microsoft Teams notifications
+- Monitoring multiple services
+- AWS EC2 deployment and operational automation
 - Prometheus metrics integration
-- Grafana monitoring dashboard
-- Multi-service monitoring
-- Kubernetes health monitoring
-
----
+- Grafana monitoring dashboards
+- Docker container health monitoring
+- Kubernetes health checks
+- Improved alerting, reporting, and recovery metrics
 
 ## Learning Outcomes
 
-Through this project, I gained practical experience in:
+This project provided practical experience with:
 
-- Python-based system monitoring using the `psutil` library.
-- Collecting and analyzing CPU, memory, and disk usage metrics.
-- Building modular Python applications using multiple modules.
-- Configuration management using a dedicated `config.py` file.
-- Implementing structured logging with Python's `logging` module.
-- Exception handling and application error management.
-- Designing threshold-based alerting and automated recovery workflows.
-- Linux service management and Bash scripting fundamentals.
-- Organizing projects using professional software architecture principles.
-- Version control using Git and GitHub with meaningful commits.
-- Understanding basic DevOps and Site Reliability Engineering (SRE) concepts.
----
+- Collecting system metrics using Python and `psutil`
+- Configurable threshold-based monitoring
+- Linux service management using `systemctl`
+- Bash scripting and automated service recovery
+- Integrating Python monitoring with shell scripts
+- Structured logging and exception handling
+- Validating recovery outcomes
+- Modular application design
+- Git-based version control
+- DevOps and SRE principles such as service health checks, remediation, and availability
 
 ## License
 
 This project is licensed under the MIT License.
 
----
-
 ## Author
 
 **Gardhas Roshitha**
 
-Aspiring System Development Engineer with interests in Linux, AWS, DevOps, Cloud Infrastructure, Automation, and System Reliability Engineering.
+Aspiring System Development Engineer interested in Linux, AWS, DevOps, cloud infrastructure, automation, and Site Reliability Engineering.
 
 GitHub: https://github.com/roshithagardhas
-
----

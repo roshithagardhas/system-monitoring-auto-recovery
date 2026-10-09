@@ -1,40 +1,34 @@
+
 #!/bin/bash
 
-# ==========================================
-# System Monitoring & Auto-Recovery
-# Service Recovery Script
-# ==========================================
+set -u
 
 SERVICE="nginx"
 
-check_service() {
+echo "========================================="
+echo "Service Recovery Check"
+echo "Time: $(date)"
+echo "========================================="
 
-    echo "========================================="
-    echo "Service Status Check"
-    echo "Time: $(date)"
-    echo "========================================="
+if systemctl is-active --quiet "$SERVICE"; then
+    echo "[INFO] $SERVICE is already running."
+    exit 0
+fi
 
-    if systemctl is-active --quiet "$SERVICE"
-    then
-        echo "[INFO] $SERVICE service is running."
+echo "[WARNING] $SERVICE is down."
+echo "[INFO] Attempting to restart $SERVICE..."
 
-    else
-        echo "[WARNING] $SERVICE service is down."
-        echo "[INFO] Attempting to restart..."
+if ! systemctl restart "$SERVICE"; then
+    echo "[ERROR] Restart command failed for $SERVICE."
+    exit 1
+fi
 
-        sudo systemctl restart "$SERVICE"
+sleep 2
 
-        if systemctl is-active --quiet "$SERVICE"
-        then
-            echo "[SUCCESS] $SERVICE restarted successfully."
-        else
-            echo "[ERROR] Failed to restart $SERVICE."
-        fi
-    fi
-}
-
-main() {
-    check_service
-}
-
-main
+if systemctl is-active --quiet "$SERVICE"; then
+    echo "[SUCCESS] $SERVICE restarted successfully."
+    exit 0
+else
+    echo "[ERROR] $SERVICE is still inactive after restart."
+    exit 1
+fi
